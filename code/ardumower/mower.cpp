@@ -104,16 +104,17 @@ Mower::Mower(){
   perimeterTrackRollTime     = 1500;       // roll time during perimeter tracking
   perimeterTrackRevTime      = 2200;       // reverse time during perimeter tracking
   #if defined (ROBOT_ARDUMOWER)
-	  perimeterPID.Kp            = 51.0;       // perimeter PID controller
-    perimeterPID.Ki            = 12.5;
-    perimeterPID.Kd            = 0.8;  
+	  perimeterPID.Kp            = 16.0;       // perimeter PID controller
+	  perimeterPID.Ki            = 8.0;
+      perimeterPID.Kd            = 0.8;  
 	#else // ROBOT_MINI
 		perimeterPID.Kp    = 24.0;  // perimeter PID controller
     perimeterPID.Ki    = 7.0;
     perimeterPID.Kd    = 9.0;
 	#endif  
   
-  trackingPerimeterTransitionTimeOut              = 0;   // 0=disable
+  // WM _Peri
+  trackingPerimeterTransitionTimeOut              = 2500;   // never<500 ms
   trackingErrorTimeOut                            = 10000;  // 0=disable
   trackingBlockInnerWheelWhilePerimeterStruggling = 1;
   
@@ -346,7 +347,10 @@ void Mower::setup(){
   pinMode(pinMotorMowRpm, INPUT);    
   pinMode(pinMotorMowEnable, OUTPUT);
   digitalWrite(pinMotorMowEnable, HIGH);  
-  pinMode(pinMotorMowFault, INPUT);      
+  pinMode(pinMotorMowFault, INPUT);
+  
+// WM Pullup , sonst kommt "Error: motor mow fault"
+  digitalWrite(pinMotorMowFault, HIGH);  
     
   // lawn sensor
   pinMode(pinLawnBackRecv, INPUT);
@@ -610,7 +614,8 @@ int Mower::readSensor(char type){
 
 void Mower::setActuator(char type, int value){
   switch (type){
-    case ACT_MOTOR_MOW: setMC33926(pinMotorMowDir, pinMotorMowPWM, value); break;// Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+    // WM case ACT_MOTOR_MOW: setMC33926(pinMotorMowDir, pinMotorMowPWM, value); break;// Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+    case ACT_MOTOR_MOW: setL6203(pinMotorMowDir, pinMotorMowPWM, value); break;				// Motortreibereinstellung - bei Bedarf ändern z.B setL298N auf setMC33926
     case ACT_MOTOR_LEFT: setMC33926(pinMotorLeftDir, pinMotorLeftPWM, value); break;//                                                                  Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
     case ACT_MOTOR_RIGHT: setMC33926(pinMotorRightDir, pinMotorRightPWM, value); break; //                                                              Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
     case ACT_BUZZER: if (value == 0) Buzzer.noTone(); else Buzzer.tone(value); break;

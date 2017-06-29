@@ -44,3 +44,5 @@
 
 # AVR Studio
 *.cppproj
+*.atsln
+*vsarduino*

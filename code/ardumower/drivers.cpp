@@ -129,6 +129,31 @@ String date2str(date_t date){
 }   
             
 
+// WM
+// L6203 motor driver
+// Motorbremse added
+// IN1/PinPWM         IN2/PinDir
+// (0-255)            L     Forward
+// (0-255)            H     Reverse
+// H                  H     Brake
+void setL6203(int pinDir, int pinPWM, int speed){
+	if (speed == 0){
+    // WM Motorbremse
+    digitalWrite(pinDir, HIGH);
+    PinMan.analogWrite(pinPWM, 255);
+    // digitalWrite(pinDir, LOW);
+		// PinMan.analogWrite(pinPWM, 0);
+    }
+	else if (speed < 0){
+		digitalWrite(pinDir, LOW) ;
+		PinMan.analogWrite(pinPWM, ((byte)255-speed));
+		} 
+	else {
+		digitalWrite(pinDir, HIGH) ;
+		PinMan.analogWrite(pinPWM, ((byte)255-speed));
+	}
+}
+
 // L298N motor driver
 // IN2/C(10)/PinPWM   IN1/D(12)/PinDir
 // H                  L     Forward
