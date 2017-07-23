@@ -104,20 +104,19 @@ Mower::Mower(){
   perimeterTrackRollTime     = 1500;       // roll time during perimeter tracking
   perimeterTrackRevTime      = 2200;       // reverse time during perimeter tracking
   #if defined (ROBOT_ARDUMOWER)
-	  perimeterPID.Kp            = 16.0;       // perimeter PID controller
-	  perimeterPID.Ki            = 8.0;
-      perimeterPID.Kd            = 0.8;  
+	  perimeterPID.Kp            = 16;       // perimeter PID controller
+    perimeterPID.Ki            = 8;
+    perimeterPID.Kd            = 0.8;  
 	#else // ROBOT_MINI
 		perimeterPID.Kp    = 24.0;  // perimeter PID controller
     perimeterPID.Ki    = 7.0;
     perimeterPID.Kd    = 9.0;
 	#endif  
   
-  // WM _Peri
   trackingPerimeterTransitionTimeOut              = 2500;   // never<500 ms
   trackingErrorTimeOut                            = 10000;  // 0=disable
   trackingBlockInnerWheelWhilePerimeterStruggling = 1;
-  
+  MaxSpeedperiPwm = 200; // speed max in PWM while perimeter tracking
   // ------ lawn sensor --------------------------------
   lawnSensorUse     = 0;                   // use capacitive lawn Sensor
   
@@ -141,7 +140,7 @@ Mower::Mower(){
 		batGoHomeIfBelow           = 23.7;       // drive home voltage (Volt)  	
 		startChargingIfBelow       = 32.0;      // start charging if battery Voltage is below (99999=disabled)
 		batFull                    = 29.4;      // battery reference Voltage (fully charged) PLEASE ADJUST IF USING A DIFFERENT BATTERY VOLTAGE! FOR a 12V SYSTEM TO 14.4V		
-		batFullCurrent             = 0.2;       // current flowing when battery is fully charged	(amp), (-99999=disabled)	
+		batFullCurrent             = 0.1;       // current flowing when battery is fully charged	(amp), (-99999=disabled)	
 	#else  // ROBOT_MINI
 		batMonitor                 = 1;          // monitor battery and charge voltage?
 		batSwitchOffIfBelow        = 5.0;       // switch off battery if below voltage (Volt)
@@ -348,10 +347,10 @@ void Mower::setup(){
   pinMode(pinMotorMowEnable, OUTPUT);
   digitalWrite(pinMotorMowEnable, HIGH);  
   pinMode(pinMotorMowFault, INPUT);
-  
-// WM Pullup , sonst kommt "Error: motor mow fault"
+
+  // WM Pullup , sonst kommt "Error: motor mow fault"
   digitalWrite(pinMotorMowFault, HIGH);  
-    
+
   // lawn sensor
   pinMode(pinLawnBackRecv, INPUT);
   pinMode(pinLawnBackSend, OUTPUT);
@@ -614,8 +613,8 @@ int Mower::readSensor(char type){
 
 void Mower::setActuator(char type, int value){
   switch (type){
-    // WM case ACT_MOTOR_MOW: setMC33926(pinMotorMowDir, pinMotorMowPWM, value); break;// Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
-    case ACT_MOTOR_MOW: setL6203(pinMotorMowDir, pinMotorMowPWM, value); break;				// Motortreibereinstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+    // wm case ACT_MOTOR_MOW: setMC33926(pinMotorMowDir, pinMotorMowPWM, value); break;// Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+    case ACT_MOTOR_MOW: setL6203(pinMotorMowDir, pinMotorMowPWM, value); break;// Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
     case ACT_MOTOR_LEFT: setMC33926(pinMotorLeftDir, pinMotorLeftPWM, value); break;//                                                                  Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
     case ACT_MOTOR_RIGHT: setMC33926(pinMotorRightDir, pinMotorRightPWM, value); break; //                                                              Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
     case ACT_BUZZER: if (value == 0) Buzzer.noTone(); else Buzzer.tone(value); break;
