@@ -294,6 +294,9 @@ class Robot
     boolean rotateLeft;
     unsigned long nextTimeRotationChange;
     bool motorErrorSense;
+	float lastmotorLeftPWMCurr;	// WM
+	float lastmotorRightPWMCurr;	// WM
+
     // -------- mower motor state -----------------------
     // mower motor sppeed; range 0..motorMowSpeedMaxPwm
     float motorMowAccel       ;  // motor mower acceleration (warning: do not set too high)

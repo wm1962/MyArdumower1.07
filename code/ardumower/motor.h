@@ -56,13 +56,26 @@ void Robot::setMotorPWM(int pwmLeft, int pwmRight, boolean useAccel){
   if (useAccel){  
     // http://phrogz.net/js/framerate-independent-low-pass-filter.html 
     // smoothed += elapsedTime * ( newValue - smoothed ) / smoothing;          
-    motorLeftPWMCurr += TaC * (pwmLeft - motorLeftPWMCurr) / motorAccel;
-    motorRightPWMCurr += TaC * (pwmRight - motorRightPWMCurr) / motorAccel;   
-  } else {		
+
+    // WM smooth only if speed is/was set to zero
+	if (((pwmLeft == 0) && (lastmotorLeftPWMCurr != 0) && (pwmRight == 0) && (lastmotorRightPWMCurr != 0)) || 
+	    ((pwmLeft != 0) && (lastmotorLeftPWMCurr == 0) && (pwmRight != 0) && (lastmotorRightPWMCurr == 0)) ) {
+		motorLeftPWMCurr += TaC * (pwmLeft - motorLeftPWMCurr) / motorAccel;
+		motorRightPWMCurr += TaC * (pwmRight - motorRightPWMCurr) / motorAccel;   
+	} 
+	else {
 		motorLeftPWMCurr = pwmLeft;
-    motorRightPWMCurr = pwmRight;
+		motorRightPWMCurr = pwmRight;
 	}
+  }
+  else {		
+	motorLeftPWMCurr = pwmLeft;
+    motorRightPWMCurr = pwmRight;
+  }
 		 
+  lastmotorLeftPWMCurr  = motorLeftPWMCurr;
+  lastmotorRightPWMCurr = motorRightPWMCurr;
+
   // ---------------------------------
   if (motorLeftSwapDir)  // swap pin polarity?
     setActuator(ACT_MOTOR_LEFT, -motorLeftPWMCurr);
@@ -380,7 +393,9 @@ void Robot::motorControl(){
       Console.println(leftSpeed);            
     } */ 
 
-    setMotorPWM( leftSpeed, rightSpeed, false );              
+// WM    setMotorPWM( leftSpeed, rightSpeed, false );              
+    setMotorPWM( leftSpeed, rightSpeed, true );		// WM Soft-Brake in Odometry
+
   }
   else{
     int leftSpeed = min(motorSpeedMaxPwm, max(-motorSpeedMaxPwm, map(motorLeftSpeedRpmSet, -motorSpeedMaxRpm, motorSpeedMaxRpm, -motorSpeedMaxPwm, motorSpeedMaxPwm)));
