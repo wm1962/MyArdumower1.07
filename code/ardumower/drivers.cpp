@@ -141,16 +141,14 @@ void setL6203(int pinDir, int pinPWM, int speed){
     // WM Motorbremse
     digitalWrite(pinDir, HIGH);
     PinMan.analogWrite(pinPWM, 255);
-    // digitalWrite(pinDir, LOW);
-		// PinMan.analogWrite(pinPWM, 0);
     }
 	else if (speed < 0){
-		digitalWrite(pinDir, LOW) ;
-		PinMan.analogWrite(pinPWM, ((byte)255-speed));
+		digitalWrite(pinDir, HIGH) ;
+		PinMan.analogWrite(pinPWM, 255-((byte)abs(speed)));
 		} 
 	else {
-		digitalWrite(pinDir, HIGH) ;
-		PinMan.analogWrite(pinPWM, ((byte)255-speed));
+		digitalWrite(pinDir, LOW) ;
+		PinMan.analogWrite(pinPWM, ((byte)speed));
 	}
 }
 
